@@ -28,6 +28,8 @@ class User(UserMixin):
         self.email = email
         self.password = password
 
+
+
 @login_manager.user_loader
 def load_user(user_id):
     cur = mysql.connection.cursor()
@@ -65,12 +67,36 @@ def login():
 def main():
     return render_template('login.html')
 
+
+
 @app.route('/data')# App Web
 def data():
     cur = mysql.connection.cursor()
     cur.execute('SELECT * FROM contact')
     data = cur.fetchall()
     return render_template( 'index.html', clientes = data)
+
+@app.route('/save') 
+def save():
+    return render_template('save.html')
+
+
+@app.route('/add', methods=['POST'])
+def add():
+    if request.method == 'POST':
+        fullname = request.form['fullname']
+        phone = request.form['phone']
+        email = request.form['email']
+        grupo = request.form['grupo']
+        print(grupo)
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute(
+                "INSERT INTO contact (fullname, phone, email, grupo) VALUES (%s,%s,%s,%s)", (fullname, phone, email, grupo))
+            mysql.connection.commit()
+            return redirect(url_for('data'))
+        except Exception as e:
+            return render_template('login.html')
 
 
 @app.route('/edit/<id>')
@@ -88,14 +114,16 @@ def update_contact(id):
         fullname = request.form['fullname']
         phone = request.form['phone']
         email = request.form['email']
+        grupo = request.form['grupo']
         cur = mysql.connection.cursor()
         cur.execute("""
             UPDATE contact
             SET fullname = %s,
                 email = %s,
-                phone = %s
+                phone = %s,
+                grupo = %s
             WHERE id = %s
-        """, (fullname, email, phone, id))
+        """, (fullname, email, phone, grupo, id))
         mysql.connection.commit()
         return redirect(url_for('data')) 
 

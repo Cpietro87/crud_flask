@@ -67,9 +67,28 @@ def login():
 def main():
     return render_template('login.html')
 
+# Grafícos
+@app.route('/grafico')
+def grafico():
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT grupo, COUNT(*) FROM contact GROUP BY grupo')
+    data = cur.fetchall()
+    print(data)
+    labels = [row[0] for row in data]
+    values = [row[1] for row in data]
 
+    return render_template('graph.html', labels=labels, values=values)
 
-@app.route('/data')# App Web
+# Ruta de logout
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('has cerrado sesión')
+    return redirect(url_for('login'))
+
+# Read
+@app.route('/data')
 def data():
     cur = mysql.connection.cursor()
     cur.execute('SELECT * FROM contact')
@@ -126,9 +145,6 @@ def update_contact(id):
         """, (fullname, email, phone, grupo, id))
         mysql.connection.commit()
         return redirect(url_for('data')) 
-
-
-
 # Server
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

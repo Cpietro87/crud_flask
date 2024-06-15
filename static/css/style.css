@@ -1,3 +1,16 @@
 body {
     background: rgb(59, 58, 58);
 }
+.graph{
+    color: white;
+    text-align: center;
+}
+.chart-container {
+    width: 50%; 
+    margin: auto;
+}
+
+#myChart {
+    width: 100% !important;
+    height: auto !important;
+}
